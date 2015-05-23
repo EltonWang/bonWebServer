@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(addCustomViewHelpers);
 app.use(session({
     secret: 'bonWebServer',
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60000 },
     secret: 'bonbonWebServer'
