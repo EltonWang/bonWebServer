@@ -1,0 +1,243 @@
+<% include top.ejs %>
+
+
+
+<script type="text/jsx">
+
+    var hardSequeneceIDs = ["3104", "3105", "3106"];
+    var hardSequenceNum = 0;
+    var hardSequenceCount = 0;
+
+    var categoryMapping = {
+        '臺北市臺北旅遊網-景點資料(中文)': '景點',
+        '臺北市文化資產': '文化',
+        '臺北市藝文館所': '藝文',
+        '臺北市臺北市101個觀光亮點資料': '101觀光',
+        '臺北市休閒城市公園': '休閒',
+        '臺北市市場': '市場'
+    };
+
+    var QuestionContentBox = React.createClass({
+
+        render: function(){
+        return '';
+        }
+    });
+
+    var QuestionPanel = React.createClass({
+
+        getInitialState: function(){
+            return { qState: 'initial' };
+        },
+        createInitialPage: function(){
+            return (
+                <div className="state_initial">
+                    <img src="/public/img/taipei_main-1.jpg" style={{"width":"100%", "height": "100%", "cursor": "pointer"}} onClick={this.stateChangeToCategory}/>
+                    <div className="entryText">
+                        <span className="" onClick={this.stateChangeToCategory}>開始棒棒</span>
+                    </div>
+                </div>
+            );
+        },
+        categoryClickHandler: function(data){
+            var self = this;
+            var category = data.currentTarget.getAttribute('data-rid');
+            questionModule.getQuestionRequest(data.currentTarget.getAttribute('data-rid'), function(data){
+                if(_.isEmpty(data)){
+                    $('#noQuestionAlert').show();
+                    $('#noQuestionAlert').fadeOut("slow");
+                }else{
+                    self.setState({
+                        qState: 'question',
+                        question: data,
+                        category: category
+                    });
+                }
+            });
+        },
+        shuffle: function(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        },
+        createCategoryPage: function(){
+            var self = this;
+            var categories = this.props.categories;
+            var createCategoriesButtons = function(){
+                return categories.map(function(category) {
+                    var categoryName = categoryMapping[category.data_set] ? categoryMapping[category.data_set] : "Crap!";
+                    return (
+                        <button type="button" className="btn btn-primary" data-rid={category.rid} onClick={self.categoryClickHandler} data-toggle="button" aria-pressed="true" autoComplete="off">
+                            {categoryName}
+                        </button>
+                    );
+                });
+            }
+            return (
+                <div className="state_category">
+                    {createCategoriesButtons()}
+                    <div className="alert alert-danger" id="noQuestionAlert" role="alert" style={{"display": "none"}}>
+                        <strong>Still not open yet!</strong>
+                    </div>
+                </div>
+            );
+        },
+        checkAnswer: function(){
+            var selectedAnser = _.find(this.refs, function(refDom){
+                if(refDom.props.type === 'radio' && $(refDom.getDOMNode()).prop("checked")){
+                    return true;
+                }
+            });
+            var correct = questionModule.checkAnswer(this.state.question, selectedAnser.props.value);
+            if(correct){
+                this.setState({
+                    qState: 'question_answered',
+                    isHit: true
+                });
+            }else{
+                this.setState({
+                    qState: 'question_answered',
+                    isHit: false
+                });
+            }
+        },
+        createQuestionPage: function(){
+            var self = this;
+            var question = this.state.question;
+            var createAnswerButtons = function(options){
+                var optionsArr = JSON.parse(options.replace(/\r/g, ''));
+                optionsArr.push(question.name);
+                return self.shuffle(optionsArr).map(function(option, index) {
+                    if(index == 0){
+                        return (
+                            <label className="btn btn-primary active" style={{"width": "100%"}}>
+                                <input type="radio" name="answers" ref={"answer"+index} autoComplete="off" value={option} checked="checked"/> {option}
+                            </label>
+                        );
+                    }else{
+                        return (
+                            <label className="btn btn-primary" style={{"width": "100%"}}>
+                                <input type="radio" name="answers" ref={"answer"+index} autoComplete="off" value={option}/> {option}
+                            </label>
+                        );
+                    }
+
+                });
+            }
+            return (
+                <div className="state_question">
+                    <img src={question.photo_uri} ref="questionImg" id="questionImg" style={{"height": "100%"}} />
+                    <div className="question_intro_desc">
+                        <div className="answerGroup">請問照片所指的是:</div>
+                        <div className="btn-group answerGroup" data-toggle="buttons">
+                            {createAnswerButtons(question.options)}
+                        </div>
+                        <br/>
+                        <button type="button" ref="confirmButton" className="btn btn-default btn-sm bottomButton" onClick={this.checkAnswer} style={{"marginTop": "15px"}}>確定</button>
+                    </div>
+                </div>
+            );
+        },
+        continueQuestion: function(){
+            var self = this;
+            questionModule.getQuestionRequest(this.state.category, function(data){
+                if(_.isEmpty(data)){
+                    $('#noQuestionAlert').show();
+                    $('#noQuestionAlert').fadeOut("slow");
+                }else{
+                    self.setState({
+                        qState: 'question',
+                        question: data
+                    });
+                }
+            });
+        },
+        createQuestionAnsweredPage: function(){
+            var question = this.state.question;
+            var isHit = this.state.isHit;
+            return (
+                <div className="state_question">
+                    <img src={question.photo_uri} style={{"height": "100%"}} />
+                    <div className="question_intro_desc">
+                        {
+                            isHit ? <p className="answerText"style={{"marginTop": "15px", "color": "red", "fontWeight": "bold", "fontSize": "16px"}}>答對了!</p> : <p className="answerText">再接再厲!</p>
+                        }
+                        <div className="answerGroup">圖片答案: {question.name}</div>
+                        <p>{question.description}</p>
+                        <button type="button" ref="nextQuestionButton" className="btn btn-default btn-sm bottomButton" onClick={this.continueQuestion} style={{"marginTop": "15px"}}>懂了!</button>
+                    </div>
+                </div>
+            );
+        },
+        render: function() {
+            if(this.state.qState === 'initial'){
+                return this.createInitialPage()
+            }else if(this.state.qState === 'category'){
+                return this.createCategoryPage()
+            }else if(this.state.qState === 'question'){
+                return this.createQuestionPage()
+            }else if(this.state.qState === 'question_answered'){
+                return this.createQuestionAnsweredPage()
+            }
+        },
+        stateChangeToCategory: function(){
+            this.setState({
+                qState: 'category'
+            });
+        },
+        componentDidUpdate: function(){
+            var imgHeight = $(document).height() - $('.question_intro_desc').height() - $('.masthead').height() - 100;
+            imgHeight = imgHeight < 0 ? 300 : imgHeight;
+            //$(this.refs.questionImg.getDOMNode()).height(imgHeight);
+            $('#questionImg').height(imgHeight);
+        }
+    });
+
+    $(document).trigger('questionContentBoxCreated');
+
+
+</script>
+
+<div class="inner cover" id="questionContainer">
+    <!--
+    <h1 class="cover-heading">Cover your page.</h1>
+    <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the text, and add your own fullscreen background photo to make it your own.</p>
+    <p class="lead">
+        <a href="#" class="btn btn-lg btn-default">Learn more</a>
+    </p>
+    -->
+
+    Loading...
+
+</div>
+
+<script>
+    var pageDataJSONStr = '<%= escapeForJavaScript(pageData) %>';
+    var pageDataObj = JSON.parse(pageDataJSONStr.replace(/x22/g, '"'));
+
+    $(document).bind('questionContentBoxCreated', function(){
+        var questionPanel = React.createElement(QuestionPanel, pageDataObj);
+        React.render(questionPanel, document.getElementById('questionContainer'));
+    });
+
+    $(document).ready(function(){
+        var questionContainerHeight = $(document).height() - $('.masthead').height() - $('.mastfoot').height();
+        $('#questionContainer').height(questionContainerHeight)
+    });
+</script>
+
+
+
+<% include foot.ejs %>

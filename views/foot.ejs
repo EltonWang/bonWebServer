@@ -1,0 +1,94 @@
+
+<div class="mastfoot">
+    <div class="inner">
+        <a id="copyrightWords" style="display:none" onclick="openCopyrightModal();event.preventDefault();">This work is only used in Taipei Hackathon. This work is copyright © Taipei bonbon team 2015. All rights reserved.</a>
+        <!-- Button trigger modal -->
+
+        <button type="button" id="copyrightButton" class="btn btn-primary btn-lg" style="display:none;" data-toggle="modal" data-target="#copyrightModal">
+            Launch demo modal
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="copyrightModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Rights
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            This document is made available to you for personal use only. You may:
+                        </p>
+                        <p>
+                            Read the document online using any software that traverses the Internet and connects to the World Wide Web server where this document is stored;
+                            Download the document and make a single copy of it: either on paper or on any online medium, for personal use only;
+                            Read a locally stored copy;
+                            Pass the URL (Universal Resource Locator) of any of these documents to anyone you want.
+                        </p>
+                        <p>
+                            You may not:
+                            Alter these files in any way shape or form including deletion or modification of the HREFs linking them to this copyright message;
+                            Represent yourself or some third party other than Barrington J. Bayley as the owner or author of this document; or
+                            Violate the terms of this copyright declaration or the terms of the Berne Convention or of the copyright laws of your own country in respect of this document or the terms of the Berne Convention or of the copyright laws of your own country in respect of the document to which this copyright declaration is linked.
+                            In addition, if you want to:
+                            Make copies of this document and/or distribute copies of this document for personal or corporate profit, or
+                            Make a copy of this document for storage or public access on any computer system other than this one that is intended to be publicly accessible
+                            you should contact the author for licensing information first.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="/public/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/public/js/underscore-min.js"></script>
+<script type="text/javascript">
+    (function () {
+        'use strict';
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement('style')
+            msViewportStyle.appendChild(
+                    document.createTextNode(
+                            '@-ms-viewport{width:auto!important}'
+                    )
+            )
+            document.querySelector('head').appendChild(msViewportStyle)
+        }
+    })();
+
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+    };
+/*
+    function success(pos) {
+        var crd = pos.coords;
+
+        console.log('Your current position is:');
+        console.log('Latitude : ' + crd.latitude);
+        console.log('Longitude: ' + crd.longitude);
+        console.log('More or less ' + crd.accuracy + ' meters.');
+    };
+
+    function error(err) {
+        console.warn('ERROR(' + err.code + '): ' + err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
+*/
+</script>
+</body>
+</html>
